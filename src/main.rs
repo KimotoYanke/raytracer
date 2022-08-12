@@ -1,11 +1,12 @@
 pub mod vec3;
 
+use vec3::Vec3;
+
 fn main() {
-    let mut img = image::RgbImage::new(512, 512);
+    let mut img = image::RgbImage::new(256, 256);
     for (x, y, pixel) in img.enumerate_pixels_mut() {
-        let r = (0.3 * x as f32) as u8;
-        let b = (0.3 * y as f32) as u8;
-        *pixel = image::Rgb([r, 0, b]);
+        let color = Vec3::new((x as f64) / 256.0, (y as f64) / 256.0, 0);
+        *pixel = color.to_rgb()
     }
     img.save("result.png").unwrap();
 }
