@@ -1,6 +1,6 @@
 use std::{fmt, ops};
 
-#[derive(Debug, PartialEq, Clone, Default)]
+#[derive(Debug, PartialEq, Clone, Default, Copy)]
 pub struct Vec3(f64, f64, f64);
 
 impl Vec3 {
@@ -66,6 +66,13 @@ impl ops::Add for &Vec3 {
     }
 }
 
+impl ops::Add for Vec3 {
+    type Output = Vec3;
+    fn add(self, rhs: Self) -> Self::Output {
+        return &self + &rhs;
+    }
+}
+
 impl ops::AddAssign for Vec3 {
     fn add_assign(&mut self, rhs: Self) {
         self.0 += rhs.0;
@@ -78,6 +85,13 @@ impl ops::Sub for &Vec3 {
     type Output = Vec3;
     fn sub(self, rhs: Self) -> Self::Output {
         return Vec3(self.0 - rhs.0, self.1 - rhs.1, self.2 - rhs.2);
+    }
+}
+
+impl ops::Sub for Vec3 {
+    type Output = Vec3;
+    fn sub(self, rhs: Self) -> Self::Output {
+        return &self - &rhs;
     }
 }
 
@@ -97,6 +111,13 @@ impl<T: Into<f64>> ops::Mul<T> for &Vec3 {
     }
 }
 
+impl<T: Into<f64>> ops::Mul<T> for Vec3 {
+    type Output = Vec3;
+    fn mul(self, rhs: T) -> Self::Output {
+        return &self * rhs;
+    }
+}
+
 impl<T: Into<f64>> ops::MulAssign<T> for Vec3 {
     fn mul_assign(&mut self, rhs: T) {
         let rhs = rhs.into();
@@ -111,6 +132,13 @@ impl<T: Into<f64>> ops::Div<T> for &Vec3 {
     fn div(self, rhs: T) -> Self::Output {
         let rhs = rhs.into();
         return Vec3(self.0 / rhs, self.1 / rhs, self.2 / rhs);
+    }
+}
+
+impl<T: Into<f64>> ops::Div<T> for Vec3 {
+    type Output = Vec3;
+    fn div(self, rhs: T) -> Self::Output {
+        return &self / rhs;
     }
 }
 
