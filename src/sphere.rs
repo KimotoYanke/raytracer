@@ -37,6 +37,8 @@ impl Hittable for Sphere {
                 rec.t = temp;
                 rec.p = r.at(rec.t);
                 rec.normal = (rec.p - *center) / radius;
+                let outward_normal = (rec.p - *center) / radius;
+                rec.set_face_normal(r, &outward_normal);
                 return true;
             }
             let temp = (-half_b + root) / a;
@@ -44,6 +46,8 @@ impl Hittable for Sphere {
                 rec.t = temp;
                 rec.p = r.at(rec.t);
                 rec.normal = (rec.p - *center) / radius;
+                let outward_normal = (rec.p - *center) / radius;
+                rec.set_face_normal(r, &outward_normal);
                 return true;
             }
         }
