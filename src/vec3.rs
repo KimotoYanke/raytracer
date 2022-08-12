@@ -1,9 +1,13 @@
 use std::{fmt, ops};
 
-#[derive(Debug, PartialEq, Clone)]
+#[derive(Debug, PartialEq, Clone, Default)]
 pub struct Vec3(f64, f64, f64);
 
 impl Vec3 {
+    pub fn new<T1: Into<f64>, T2: Into<f64>, T3: Into<f64>>(x: T1, y: T2, z: T3) -> Self {
+        Vec3(x.into(), y.into(), z.into())
+    }
+
     pub fn x(&self) -> f64 {
         return self.0;
     }
@@ -36,6 +40,15 @@ impl Vec3 {
 
     pub fn unit(&self) -> Self {
         return self / self.length();
+    }
+
+    pub fn to_rgb(&self) -> image::Rgb<u8> {
+        let n256 = 256.0;
+        return image::Rgb([
+            (self.x() * n256) as u8,
+            (self.y() * n256) as u8,
+            (self.z() * n256) as u8,
+        ]);
     }
 }
 
@@ -122,7 +135,7 @@ mod tests {
 
     #[test]
     fn xyz() {
-        let vec = Vec3(0.0, 1.0, 2.0);
+        let vec = Vec3::new(0, 1, 2);
         assert_eq!(vec.x(), 0.0);
         assert_eq!(vec.y(), 1.0);
         assert_eq!(vec.z(), 2.0);
@@ -130,90 +143,98 @@ mod tests {
 
     #[test]
     fn length() {
-        let vec = Vec3(0.0, 3.0, 4.0);
+        let vec = Vec3::new(0, 3, 4);
         assert_eq!(vec.length(), 5.0);
         assert_eq!(vec.length_squared(), 25.0);
     }
 
     #[test]
     fn neg() {
-        assert_eq!(-Vec3(0.0, 1.0, 2.0), Vec3(0.0, -1.0, -2.0));
+        assert_eq!(-Vec3::new(0, 1, 2), Vec3::new(0, -1, -2));
     }
 
     #[test]
     fn add() {
         assert_eq!(
-            &Vec3(0.0, 1.0, 2.0) + &Vec3(2.0, 1.0, 0.0),
-            Vec3(2.0, 2.0, 2.0)
+            &Vec3::new(0, 1.0, 2.0) + &Vec3::new(2.0, 1.0, 0.0),
+            Vec3::new(2.0, 2.0, 2.0)
         );
     }
 
     #[test]
     fn sub() {
         assert_eq!(
-            &Vec3(0.0, 1.0, 2.0) - &Vec3(2.0, 1.0, 0.0),
-            Vec3(-2.0, 0.0, 2.0)
+            &Vec3::new(0.0, 1.0, 2.0) - &Vec3::new(2.0, 1.0, 0.0),
+            Vec3::new(-2.0, 0.0, 2.0)
         );
     }
 
     #[test]
     fn add_assign() {
-        let mut a = Vec3(0.0, 1.0, 2.0);
-        a += Vec3(2.0, 1.0, 0.0);
-        assert_eq!(a, Vec3(2.0, 2.0, 2.0));
+        let mut a = Vec3::new(0.0, 1.0, 2.0);
+        a += Vec3::new(2.0, 1.0, 0.0);
+        assert_eq!(a, Vec3::new(2.0, 2.0, 2.0));
     }
 
     #[test]
     fn sub_assign() {
-        let mut a = Vec3(0.0, 1.0, 2.0);
-        a -= Vec3(2.0, 1.0, 0.0);
-        assert_eq!(a, Vec3(-2.0, 0.0, 2.0));
+        let mut a = Vec3::new(0.0, 1.0, 2.0);
+        a -= Vec3::new(2.0, 1.0, 0.0);
+        assert_eq!(a, Vec3::new(-2.0, 0.0, 2.0));
     }
 
     #[test]
     fn mul() {
-        assert_eq!(&Vec3(0.0, 1.0, 2.0) * 2, Vec3(0.0, 2.0, 4.0))
+        assert_eq!(&Vec3::new(0.0, 1.0, 2.0) * 2, Vec3::new(0.0, 2.0, 4.0))
     }
 
     #[test]
     fn mul_assign() {
-        let mut a = Vec3(0.0, 1.0, 2.0);
+        let mut a = Vec3::new(0.0, 1.0, 2.0);
         a *= 2;
-        assert_eq!(a, Vec3(0.0, 2.0, 4.0))
+        assert_eq!(a, Vec3::new(0.0, 2.0, 4.0))
     }
 
     #[test]
     fn div() {
-        assert_eq!(&Vec3(0.0, 1.0, 2.0) / 2, Vec3(0.0, 0.5, 1.0))
+        assert_eq!(&Vec3::new(0.0, 1.0, 2.0) / 2, Vec3::new(0.0, 0.5, 1.0))
     }
 
     #[test]
     fn div_assign() {
-        let mut a = Vec3(0.0, 1.0, 2.0);
+        let mut a = Vec3::new(0.0, 1.0, 2.0);
         a /= 2;
-        assert_eq!(a, Vec3(0.0, 0.5, 1.0))
+        assert_eq!(a, Vec3::new(0.0, 0.5, 1.0))
     }
 
     #[test]
     fn dot() {
-        assert_eq!(Vec3(0.0, 1.0, 2.0).dot(&Vec3(1.0, 0.0, 1.0)), 2.0)
+        assert_eq!(Vec3::new(0.0, 1.0, 2.0).dot(&Vec3::new(1.0, 0.0, 1.0)), 2.0)
     }
 
     #[test]
     fn cross() {
         assert_eq!(
-            Vec3(0.0, 1.0, 2.0).cross(&Vec3(1.0, 0.0, 1.0)),
-            Vec3(1.0, 2.0, -1.0)
+            Vec3::new(0.0, 1.0, 2.0).cross(&Vec3::new(1.0, 0.0, 1.0)),
+            Vec3::new(1.0, 2.0, -1.0)
         )
     }
 
     #[test]
     fn unit_vector() {
-        assert_eq!(Vec3(0.0, 3.0, 4.0).unit(), Vec3(0.0, 3.0 / 5.0, 4.0 / 5.0))
+        assert_eq!(
+            Vec3::new(0.0, 3.0, 4.0).unit(),
+            Vec3::new(0.0, 3.0 / 5.0, 4.0 / 5.0)
+        )
     }
 
     #[test]
     fn display() {
-        assert_eq!(format!("{}", Vec3(0.0, 1.0, 12.0)), "0.00 1.00 12.00")
+        assert_eq!(format!("{}", Vec3::new(0.0, 1.0, 12.0)), "0.00 1.00 12.00")
+    }
+
+    #[test]
+    fn to_rgb() {
+        assert_eq!(Vec3::new(0.0, 0.5, 1.0).to_rgb(), image::Rgb([0, 128, 255]))
     }
 }
