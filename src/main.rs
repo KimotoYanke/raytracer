@@ -10,10 +10,10 @@ use std::f64::INFINITY;
 use camera::Camera;
 use hittable::{HitRecord, Hittable};
 use indicatif::ProgressBar;
-use material::Lambertian;
+use material::{Lambertian, Metal};
 use rand::Rng;
 use ray::Ray;
-use vec3::{Color, Vec3};
+use vec3::Color;
 
 use crate::{hittable::HittableList, sphere::Sphere, vec3::Point3};
 
@@ -69,13 +69,24 @@ fn main() {
     world.add(Sphere::new(
         Point3::new(0, 0, -1),
         0.5,
-        Lambertian::new(Color::new(1, 0, 0)),
+        Lambertian::new(Color::new(0.7, 0.3, 0.3)),
     ));
     world.add(Sphere::new(
         Point3::new(0, -100.5, -1),
         100.0,
-        Lambertian::new(Color::new(1, 1, 1)),
+        Lambertian::new(Color::new(0.8, 0.8, 0.0)),
     ));
+    world.add(Sphere::new(
+        Point3::new(1, 0, -1),
+        0.5,
+        Metal::new(Color::new(0.8, 0.6, 0.2)),
+    ));
+    world.add(Sphere::new(
+        Point3::new(-1, 0, -1),
+        0.5,
+        Metal::new(Color::new(0.8, 0.8, 0.8)),
+    ));
+
     let samples_per_pixel: usize = 100;
     let mut rng = rand::thread_rng();
 

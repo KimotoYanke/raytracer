@@ -23,19 +23,20 @@ impl Clone for Box<dyn Material> {
     }
 }
 
-#[derive(Default, Clone)]
-pub struct Lambertian {
-    albedo: Color,
-}
 impl<T: 'static + Material + Clone> MaterialClone for T {
     fn clone_box(&self) -> Box<dyn Material> {
         Box::new(self.clone())
     }
 }
 
+#[derive(Default, Clone)]
+pub struct Lambertian {
+    albedo: Color,
+}
+
 impl Lambertian {
     pub fn new(albedo: Color) -> Self {
-        Lambertian { albedo }
+        Self { albedo }
     }
 }
 
@@ -45,5 +46,26 @@ impl Material for Lambertian {
         let scattered = Ray::new(rec.p, scatter_direction);
         let attenuation = self.albedo;
         (attenuation, scattered, true)
+    }
+}
+
+#[derive(Default, Clone)]
+pub struct Metal {
+    albedo: Color,
+}
+
+impl Metal {
+    pub fn new(albedo: Color) -> Self {
+        Self { albedo }
+    }
+}
+
+impl Material for Metal {
+    fn scatter(self: &Self, r_in: &Ray, rec: &mut HitRecord) -> (Color, Ray, bool) {
+        let reflected = r_in.direction().unit().reflect(&rec.normal);
+        let scattered = Ray::new(rec.p, reflected);
+        let attenuation = self.albedo;
+        let flg = scattered.direction().dot(&rec.normal) > 0.0;
+        return (attenuation, scattered, flg);
     }
 }

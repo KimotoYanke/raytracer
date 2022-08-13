@@ -75,6 +75,10 @@ impl Vec3 {
         let r: f64 = (1.0 as f64 - z * z).sqrt();
         return Vec3::new(r * a.cos(), r * a.sin(), z);
     }
+
+    pub fn reflect(&self, n: &Self) -> Self {
+        self - &(n * (self.dot(n) * 2.0))
+    }
 }
 
 impl ops::Neg for Vec3 {
