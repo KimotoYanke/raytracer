@@ -136,6 +136,13 @@ impl<T: Into<f64>> ops::Mul<T> for &Vec3 {
     }
 }
 
+impl ops::Mul for Vec3 {
+    type Output = Vec3;
+    fn mul(self, rhs: Vec3) -> Self::Output {
+        return Vec3(self.x() * rhs.x(), self.y() * rhs.y(), self.z() * rhs.z());
+    }
+}
+
 impl<T: Into<f64>> ops::Mul<T> for Vec3 {
     type Output = Vec3;
     fn mul(self, rhs: T) -> Self::Output {

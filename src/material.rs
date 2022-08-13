@@ -7,7 +7,7 @@ use crate::{
 };
 
 pub trait Material: MaterialClone {
-    fn scatter(self: &Self, r_in: &Ray, rec: &mut HitRecord) -> (Color, Ray)
+    fn scatter(self: &Self, r_in: &Ray, rec: &mut HitRecord) -> (Color, Ray, bool)
     where
         Color: Sized,
         Ray: Sized;
@@ -33,11 +33,17 @@ impl<T: 'static + Material + Clone> MaterialClone for T {
     }
 }
 
+impl Lambertian {
+    pub fn new(albedo: Color) -> Self {
+        Lambertian { albedo }
+    }
+}
+
 impl Material for Lambertian {
-    fn scatter(&self, _: &Ray, rec: &mut HitRecord) -> (Color, Ray) {
+    fn scatter(&self, _: &Ray, rec: &mut HitRecord) -> (Color, Ray, bool) {
         let scatter_direction = rec.normal + Vec3::random_unit_vector(&mut thread_rng());
         let scattered = Ray::new(rec.p, scatter_direction);
         let attenuation = self.albedo;
-        (attenuation, scattered)
+        (attenuation, scattered, true)
     }
 }

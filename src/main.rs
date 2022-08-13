@@ -10,6 +10,7 @@ use std::f64::INFINITY;
 use camera::Camera;
 use hittable::{HitRecord, Hittable};
 use indicatif::ProgressBar;
+use material::Lambertian;
 use rand::Rng;
 use ray::Ray;
 use vec3::{Color, Vec3};
@@ -20,11 +21,14 @@ fn ray_color<T: Hittable>(r: Ray, world: &T, depth: usize) -> Color {
     if depth <= 0 {
         return Color::new(0, 0, 0);
     }
-    let mut rng = rand::thread_rng();
     let mut rec: HitRecord = HitRecord::default();
     if world.hit(&r, 0.001, INFINITY, &mut rec) {
-        let target = rec.p + rec.normal + Vec3::random_unit_vector(&mut rng);
-        return ray_color(Ray::new(rec.p, target - rec.p), world, depth - 1) * 0.5;
+        let material = rec.material.clone();
+        let (attenuation, scattered, flg) = material.scatter(&r, &mut rec);
+        if flg {
+            return attenuation * ray_color(scattered, world, depth - 1);
+        }
+        return Color::default();
     }
     let unit_direction = r.direction().unit();
     let t = 0.5 * (unit_direction.y() + 1.0);
@@ -62,8 +66,16 @@ fn main() {
     let max_depth = 50;
 
     let mut world = HittableList::new();
-    world.add(Sphere::new(Point3::new(0, 0, -1), 0.5));
-    world.add(Sphere::new(Point3::new(0, -100.5, -1), 100.0));
+    world.add(Sphere::new(
+        Point3::new(0, 0, -1),
+        0.5,
+        Lambertian::new(Color::new(1, 0, 0)),
+    ));
+    world.add(Sphere::new(
+        Point3::new(0, -100.5, -1),
+        100.0,
+        Lambertian::new(Color::new(1, 1, 1)),
+    ));
     let samples_per_pixel: usize = 100;
     let mut rng = rand::thread_rng();
 

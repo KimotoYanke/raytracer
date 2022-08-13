@@ -1,15 +1,21 @@
 use crate::{
     hittable::{HitRecord, Hittable},
+    material::Material,
     vec3::Point3,
 };
 
 pub struct Sphere {
     center: Point3,
     radius: f64,
+    material: Box<dyn Material + 'static>,
 }
 impl Sphere {
-    pub fn new(center: Point3, radius: f64) -> Sphere {
-        Sphere { center, radius }
+    pub fn new<M: Material + 'static>(center: Point3, radius: f64, material: M) -> Sphere {
+        Sphere {
+            center,
+            radius,
+            material: Box::new(material),
+        }
     }
 
     pub fn radius(&self) -> f64 {
@@ -18,6 +24,10 @@ impl Sphere {
 
     pub fn center(&self) -> &Point3 {
         &self.center
+    }
+
+    pub fn material(&self) -> Box<dyn Material + 'static> {
+        self.material.clone_box()
     }
 }
 
@@ -39,6 +49,7 @@ impl Hittable for Sphere {
                 rec.normal = (rec.p - *center) / radius;
                 let outward_normal = (rec.p - *center) / radius;
                 rec.set_face_normal(r, &outward_normal);
+                rec.material = self.material();
                 return true;
             }
             let temp = (-half_b + root) / a;
@@ -48,6 +59,7 @@ impl Hittable for Sphere {
                 rec.normal = (rec.p - *center) / radius;
                 let outward_normal = (rec.p - *center) / radius;
                 rec.set_face_normal(r, &outward_normal);
+                rec.material = self.material();
                 return true;
             }
         }
@@ -58,18 +70,21 @@ impl Hittable for Sphere {
 #[cfg(test)]
 mod tests {
     use super::Sphere;
-    use crate::vec3::Point3;
+    use crate::{material::Lambertian, vec3::Point3};
 
     #[test]
     fn radius() {
-        assert_eq!(Sphere::new(Point3::new(0, 0, 0), 10.0).radius(), 10.0)
+        assert_eq!(
+            Sphere::new(Point3::new(0, 0, 0), 10.0, Lambertian::default()).radius(),
+            10.0,
+        )
     }
 
     #[test]
     fn center() {
         assert_eq!(
-            *Sphere::new(Point3::new(1, 2, 3), 10.0).center(),
-            Point3::new(1, 2, 3)
+            *Sphere::new(Point3::new(1, 2, 3), 10.0, Lambertian::default()).center(),
+            Point3::new(1, 2, 3),
         )
     }
 }
