@@ -1,21 +1,30 @@
 use crate::{
+    material::{Lambertian, Material},
     ray::Ray,
     vec3::{Point3, Vec3},
 };
 
-#[derive(Clone, Default)]
+#[derive(Clone)]
 pub struct HitRecord {
     pub p: Point3,
     pub normal: Vec3,
+    pub material: Box<dyn Material + 'static>,
     pub t: f64,
     pub front_face: bool,
 }
 
 impl HitRecord {
-    fn new(p: Point3, normal: Vec3, t: f64, front_face: bool) -> HitRecord {
+    fn new<M: Material + 'static>(
+        p: Point3,
+        normal: Vec3,
+        material: M,
+        t: f64,
+        front_face: bool,
+    ) -> HitRecord {
         HitRecord {
             p,
             normal,
+            material: Box::new(material),
             t,
             front_face,
         }
@@ -28,6 +37,18 @@ impl HitRecord {
         } else {
             -*outward_normal
         };
+    }
+}
+
+impl Default for HitRecord {
+    fn default() -> Self {
+        Self::new(
+            Point3::new(0, 0, 0),
+            Vec3::new(0, 0, 0),
+            Lambertian::default(),
+            0.0,
+            true,
+        )
     }
 }
 
@@ -54,7 +75,13 @@ impl<'a> HittableList<'a> {
 
 impl<'a> Hittable for HittableList<'a> {
     fn hit(&self, r: &Ray, t_min: f64, t_max: f64, rec: &mut HitRecord) -> bool {
-        let mut temp_rec = HitRecord::new(Point3::new(0, 0, 0), Vec3::new(0, 0, 0), 0.0, true);
+        let mut temp_rec = HitRecord::new(
+            Point3::new(0, 0, 0),
+            Vec3::new(0, 0, 0),
+            Lambertian::default(),
+            0.0,
+            true,
+        );
         let mut hit_anything = false;
         let mut closest_so_far = t_max;
 
