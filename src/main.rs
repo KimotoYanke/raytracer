@@ -11,14 +11,19 @@ use hittable::{HitRecord, Hittable};
 use indicatif::ProgressBar;
 use rand::Rng;
 use ray::Ray;
-use vec3::Color;
+use vec3::{Color, Vec3};
 
 use crate::{hittable::HittableList, sphere::Sphere, vec3::Point3};
 
-fn ray_color<T: Hittable>(r: Ray, world: &T) -> Color {
-    let mut hit_record: HitRecord = HitRecord::default();
-    if world.hit(&r, 0.0, INFINITY, &mut hit_record) {
-        return (hit_record.normal + Color::new(1, 1, 1)) * 0.5;
+fn ray_color<T: Hittable>(r: Ray, world: &T, depth: usize) -> Color {
+    if depth <= 0 {
+        return Color::new(0, 0, 0);
+    }
+    let mut rng = rand::thread_rng();
+    let mut rec: HitRecord = HitRecord::default();
+    if world.hit(&r, 0.001, INFINITY, &mut rec) {
+        let target = rec.p + rec.normal + Vec3::random_in_unit_sphere(&mut rng);
+        return ray_color(Ray::new(rec.p, target - rec.p), world, depth - 1) * 0.5;
     }
     let unit_direction = r.direction().unit();
     let t = 0.5 * (unit_direction.y() + 1.0);
@@ -37,9 +42,9 @@ fn clamp(x: f64, min: f64, max: f64) -> f64 {
 
 fn scale_color(color: Color, samples_per_pixel: u32) -> Color {
     let scale = 1.0 / samples_per_pixel as f64;
-    let r = color.x() * scale;
-    let g = color.y() * scale;
-    let b = color.z() * scale;
+    let r = (color.x() * scale).sqrt();
+    let g = (color.y() * scale).sqrt();
+    let b = (color.z() * scale).sqrt();
     let n0999 = 1.0 - f64::EPSILON;
     Color::new(
         clamp(r, 0.0, n0999),
@@ -50,9 +55,10 @@ fn scale_color(color: Color, samples_per_pixel: u32) -> Color {
 
 fn main() {
     let camera = Camera::default();
-    let image_width: u32 = 160 * 5;
+    let image_width: u32 = 260;
     let image_height: u32 = (image_width as f64 / camera.aspect_ratio()) as u32;
     let mut img = image::RgbImage::new(image_width, image_height);
+    let max_depth = 50;
 
     let mut world = HittableList::new();
     world.add(Sphere::new(Point3::new(0, 0, -1), 0.5));
@@ -68,7 +74,7 @@ fn main() {
             let u = (x as f64 + rng.gen::<f64>()) / (image_width - 1) as f64;
             let v = (y as f64 + rng.gen::<f64>()) / (image_height - 1) as f64;
             let r = camera.get_ray(u, v);
-            color += ray_color(r, &world);
+            color += ray_color(r, &world, max_depth);
         }
         *pixel = scale_color(color, samples_per_pixel as u32).to_rgb();
         bar.inc(1)

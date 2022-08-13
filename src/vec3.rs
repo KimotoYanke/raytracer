@@ -1,4 +1,10 @@
-use std::{fmt, ops};
+use std::{
+    f64::consts::PI,
+    fmt,
+    ops::{self, Range},
+};
+
+use rand::Rng;
 
 #[derive(Debug, PartialEq, Clone, Default, Copy)]
 pub struct Vec3(f64, f64, f64);
@@ -49,6 +55,25 @@ impl Vec3 {
             (self.y() * n256) as u8,
             (self.z() * n256) as u8,
         ]);
+    }
+
+    pub fn random<T: Rng>(rng: &mut T) -> Self {
+        Self::new(rng.gen::<f64>(), rng.gen::<f64>(), rng.gen::<f64>())
+    }
+
+    pub fn random_range<T: Rng>(rng: &mut T, range: Range<f64>) -> Self {
+        Self::new(
+            rng.gen_range::<f64, Range<f64>>(range.to_owned()),
+            rng.gen_range::<f64, Range<f64>>(range.to_owned()),
+            rng.gen_range::<f64, Range<f64>>(range),
+        )
+    }
+
+    pub fn random_in_unit_sphere<T: Rng>(rng: &mut T) -> Self {
+        let a = rng.gen_range(0.0..(2.0 * PI));
+        let z = rng.gen_range(-1.0..1.0);
+        let r: f64 = (1.0 as f64 - z * z).sqrt();
+        return Vec3::new(r * a.cos(), r * a.sin(), z);
     }
 }
 
