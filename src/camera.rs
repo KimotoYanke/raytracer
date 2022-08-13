@@ -42,14 +42,15 @@ impl Camera {
     }
     pub fn lower_left_corner(&self) -> Point3 {
         self.origin
-            - self.horizontal() / 2
-            - self.vertical() / 2
+            - (self.horizontal() / 2)
+            - (self.vertical() / 2)
             - Vec3::new(0, 0, self.focal_length)
     }
     pub fn get_ray(&self, u: f64, v: f64) -> Ray {
         Ray::new(
             self.origin,
-            self.lower_left_corner() + self.horizontal() * u + self.vertical() * v - self.origin(),
+            self.lower_left_corner() + (self.horizontal() * u) + (self.vertical() * v)
+                - self.origin(),
         )
     }
 }
