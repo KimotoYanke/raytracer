@@ -59,8 +59,8 @@ fn scale_color(color: Color, samples_per_pixel: u32) -> Color {
 }
 
 fn main() {
-    let camera = Camera::default();
-    let image_width: u32 = 260;
+    let camera = Camera::new(16.0 / 9.0, 2.0, 0.8, Point3::new(0, 0, 0));
+    let image_width: u32 = 384;
     let image_height: u32 = (image_width as f64 / camera.aspect_ratio()) as u32;
     let mut img = image::RgbImage::new(image_width, image_height);
     let max_depth = 50;
@@ -79,12 +79,12 @@ fn main() {
     world.add(Sphere::new(
         Point3::new(1, 0, -1),
         0.5,
-        Metal::new(Color::new(0.8, 0.6, 0.2)),
+        Metal::new(Color::new(0.8, 0.6, 0.2), 1.0),
     ));
     world.add(Sphere::new(
         Point3::new(-1, 0, -1),
         0.5,
-        Metal::new(Color::new(0.8, 0.8, 0.8)),
+        Metal::new(Color::new(0.8, 0.8, 0.8), 0.3),
     ));
 
     let samples_per_pixel: usize = 100;
