@@ -1,4 +1,4 @@
-use rand::thread_rng;
+use rand::RngCore;
 
 use crate::{
     hittable::HitRecord,
@@ -20,8 +20,13 @@ impl Lambertian {
 }
 
 impl Material for Lambertian {
-    fn scatter(&self, _: &Ray, rec: &mut HitRecord) -> (Color, Ray, bool) {
-        let scatter_direction = rec.normal + Vec3::random_unit_vector(&mut thread_rng());
+    fn scatter(
+        &self,
+        _: &Ray,
+        rec: &mut HitRecord,
+        rng: &mut Box<(dyn RngCore + 'static)>,
+    ) -> (Color, Ray, bool) {
+        let scatter_direction = rec.normal + Vec3::random_unit_vector(rng);
         let scattered = Ray::new(rec.p, scatter_direction);
         let attenuation = self.albedo;
         (attenuation, scattered, true)

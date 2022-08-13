@@ -1,10 +1,17 @@
 pub mod lambertian;
 pub mod metal;
 
+use rand::RngCore;
+
 use crate::{hittable::HitRecord, ray::Ray, vec3::Color};
 
 pub trait Material: MaterialClone {
-    fn scatter(self: &Self, r_in: &Ray, rec: &mut HitRecord) -> (Color, Ray, bool)
+    fn scatter(
+        self: &Self,
+        r_in: &Ray,
+        rec: &mut HitRecord,
+        rng: &mut Box<dyn RngCore>,
+    ) -> (Color, Ray, bool)
     where
         Color: Sized,
         Ray: Sized;
