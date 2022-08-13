@@ -1,5 +1,6 @@
 pub mod camera;
 pub mod hittable;
+pub mod material;
 pub mod ray;
 pub mod sphere;
 pub mod vec3;
@@ -22,7 +23,7 @@ fn ray_color<T: Hittable>(r: Ray, world: &T, depth: usize) -> Color {
     let mut rng = rand::thread_rng();
     let mut rec: HitRecord = HitRecord::default();
     if world.hit(&r, 0.001, INFINITY, &mut rec) {
-        let target = rec.p + rec.normal + Vec3::random_in_unit_sphere(&mut rng);
+        let target = rec.p + rec.normal + Vec3::random_unit_vector(&mut rng);
         return ray_color(Ray::new(rec.p, target - rec.p), world, depth - 1) * 0.5;
     }
     let unit_direction = r.direction().unit();
