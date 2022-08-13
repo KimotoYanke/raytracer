@@ -10,7 +10,7 @@ use std::f64::INFINITY;
 use camera::Camera;
 use hittable::{HitRecord, Hittable};
 use indicatif::ProgressBar;
-use material::{lambertian::Lambertian, metal::Metal};
+use material::{dielectric::Dielectric, lambertian::Lambertian, metal::Metal};
 use rand::{Rng, RngCore};
 use ray::Ray;
 use vec3::Color;
@@ -59,7 +59,7 @@ fn scale_color(color: Color, samples_per_pixel: u32) -> Color {
 }
 
 fn main() {
-    let camera = Camera::new(16.0 / 9.0, 2.0, 0.8, Point3::new(0, 0, 0));
+    let camera = Camera::new(16.0 / 9.0, 2.0, 1.0, Point3::new(0, 0, 0));
     let image_width: u32 = 384;
     let image_height: u32 = (image_width as f64 / camera.aspect_ratio()) as u32;
     let mut img = image::RgbImage::new(image_width, image_height);
@@ -69,7 +69,7 @@ fn main() {
     world.add(Sphere::new(
         Point3::new(0, 0, -1),
         0.5,
-        Lambertian::new(Color::new(0.7, 0.3, 0.3)),
+        Dielectric::new(1.51),
     ));
     world.add(Sphere::new(
         Point3::new(0, -100.5, -1),
@@ -79,12 +79,12 @@ fn main() {
     world.add(Sphere::new(
         Point3::new(1, 0, -1),
         0.5,
-        Metal::new(Color::new(0.8, 0.6, 0.2), 1.0),
+        Dielectric::new(1.51),
     ));
     world.add(Sphere::new(
         Point3::new(-1, 0, -1),
         0.5,
-        Metal::new(Color::new(0.8, 0.8, 0.8), 0.3),
+        Metal::new(Color::new(0.8, 0.8, 0.0), 0.3),
     ));
 
     let samples_per_pixel: usize = 100;
