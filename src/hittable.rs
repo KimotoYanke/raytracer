@@ -1,5 +1,5 @@
 use crate::{
-    material::{Lambertian, Material},
+    material::{lambertian::Lambertian, Material},
     ray::Ray,
     vec3::{Point3, Vec3},
 };

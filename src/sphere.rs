@@ -70,7 +70,7 @@ impl Hittable for Sphere {
 #[cfg(test)]
 mod tests {
     use super::Sphere;
-    use crate::{material::Lambertian, vec3::Point3};
+    use crate::{material::lambertian::Lambertian, vec3::Point3};
 
     #[test]
     fn radius() {

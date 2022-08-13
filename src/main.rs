@@ -10,7 +10,7 @@ use std::f64::INFINITY;
 use camera::Camera;
 use hittable::{HitRecord, Hittable};
 use indicatif::ProgressBar;
-use material::{Lambertian, Metal};
+use material::{lambertian::Lambertian, metal::Metal};
 use rand::Rng;
 use ray::Ray;
 use vec3::Color;
