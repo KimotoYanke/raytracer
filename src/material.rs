@@ -6,7 +6,7 @@ use rand::RngCore;
 
 use crate::{hittable::HitRecord, ray::Ray, vec3::Color};
 
-pub trait Material: MaterialClone {
+pub trait Material: MaterialClone + Sync + Send {
     fn scatter(
         self: &Self,
         r_in: &Ray,
