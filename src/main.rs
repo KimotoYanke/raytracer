@@ -84,7 +84,7 @@ fn main() {
     world.add(Sphere::new(
         Point3::new(-1, 0, -1),
         0.5,
-        Metal::new(Color::new(0.8, 0.8, 0.0), 0.3),
+        Metal::new(Color::new(0.0, 0.8, 0.0), 0.3),
     ));
 
     let samples_per_pixel: usize = 100;
